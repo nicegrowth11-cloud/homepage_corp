@@ -45,3 +45,17 @@ REA Chromium 런타임 관찰 Evidence: ev_87c6ddd522b3e54c066217ba90d0058aa21ff
 
 ## 주소 정정·사진 하늘 수정
 주소를 역삼하이츠 1710호로 정정했습니다. 빌딩 사진은 내장 imagegen 도구의 lighting-weather 편집으로 파란 하늘 버전을 생성하여 assets/yeoksam-blue-sky.jpg에 저장했습니다. 사용 프롬프트 요약: 건물과 구도를 유지하고 회색 구름 하늘만 자연스러운 파란 하늘과 옅은 흰 구름으로 변경. 원본 사진은 별도로 보존합니다.
+
+## Vercel 배포
+
+GitHub 저장소 `nicegrowth11-cloud/homepage_corp`를 Vercel에서 Import합니다.
+- Root Directory: 저장소 루트 (`.`). 로컬 폴더 이름인 `ceopartners`를 입력하지 않습니다.
+- Framework Preset: Other
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Node.js: 24.x
+- 환경 변수: 현재 정적 사이트에는 필요하지 않습니다.
+
+`vercel.json`에 빌드·출력 설정을 저장했습니다. `node scripts/build.mjs`는 페이지에서 사용하는 파일만 dist에 복사하고 누락된 참조 파일이 있으면 실패합니다. 과거 분석 HTML, 미사용 이미지·글꼴은 공개 배포물에 포함하지 않습니다. GitHub 연결 후 main 브랜치를 업데이트하면 Vercel에서 새 프로덕션 배포가 시작됩니다.
+
+현재 상담 폼은 브라우저 내 임시 저장 기능입니다. Vercel에 배포해도 실제 문의 전송으로 바뀌지 않습니다. 실제 접수를 사용하려면 Vercel Function과 저장소 또는 이메일 서비스를 별도 연결해야 합니다.

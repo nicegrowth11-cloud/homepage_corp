@@ -2,3 +2,6 @@
 .env
 .env.*
 *.log
+dist/
+.vercel/
+node_modules/
