@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'dist');
-const entries = ['index.html', 'conversion.html', 'local.css', 'local.js'];
+const entries = ['index.html', 'conversion.html', 'local.css', 'local.js', 'consult.js', 'consult-forms.json', 'assets/fonts/WantedSans-OFL.txt'];
 const files = new Set(entries);
 
 // Only publish files referenced by the site; keep research snapshots out of deployments.
