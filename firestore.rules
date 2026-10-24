@@ -1,32 +1,9 @@
 rules_version = '2';
-// 상담신청 저장소 보안 규칙 (자동 생성: shared/gen_rules.py ← consult-forms.json)
-// - 서버(/api/consult)는 서비스 계정으로 쓰므로 규칙을 우회합니다. 아래 규칙은 클라이언트 SDK 직접 접근에 대한 방어선입니다.
-// - 공개 조회·수정·삭제 불가. 생성은 필드 화이트리스트·길이·선택지 검증을 통과한 경우만 허용.
-// - 클라이언트 직접 쓰기를 쓰지 않는다면 `allow create: if false;` 로 더 좁혀도 됩니다(권장).
+// 상담신청 저장소 보안 규칙 — homepage-corp
+// 상담신청은 서버(/api/consult, Vercel 함수)만 서비스 계정으로 기록합니다(서비스 계정은 보안 규칙을 우회).
+// 따라서 브라우저(클라이언트 SDK)에서의 읽기·생성·수정·삭제는 모두 거부합니다.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isStr(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
-    function validAnswers(d, a) {
-      return a is map && ((d.field == 'setup' && a.keys().hasOnly(['industry', 'capital', 'timing']) && (!('industry' in a) || (isStr(a.industry, 0, 60))) && (!('capital' in a) || (a.capital in ['1천만 원 미만', '1천만~5천만 원', '5천만~1억 원', '1억 원 이상', '미정'])) && (!('timing' in a) || (a.timing in ['1개월 이내', '1~3개월', '3개월 이후', '미정']))) || (d.field == 'convert' && a.keys().hasOnly(['industry', 'years', 'revenue', 'property']) && (!('industry' in a) || (isStr(a.industry, 0, 60))) && (!('years' in a) || (a.years in ['1년 미만', '1~3년', '3~5년', '5년 이상'])) && (!('revenue' in a) || (a.revenue in ['5억 원 미만', '5억~7.5억 원', '7.5억~15억 원', '15억 원 이상', '모름'])) && (!('property' in a) || (a.property in ['있음', '없음', '모름']))) || (d.field == 'operate' && a.keys().hasOnly(['stage', 'topic']) && (!('stage' in a) || (a.stage in ['설립 예정', '설립 1년 미만', '설립 1년 이상'])) && (!('topic' in a) || (a.topic in ['기장·신고', '급여·4대보험', '증빙 관리', '기타']))));
-    }
-    function validRequest(d) {
-      return d.keys().hasOnly(['site', 'field', 'name', 'phone', 'email', 'message', 'answers', 'consent', 'consentVersion', 'status', 'createdAt'])
-        && d.keys().hasAll(['site', 'field', 'name', 'phone', 'answers', 'consent', 'consentVersion', 'status', 'createdAt'])
-        && d.site == 'homepage-corp'
-        && isStr(d.name, 2, 40)
-        && d.phone is string && d.phone.matches('^0[0-9]{1,2}-?[0-9]{3,4}-?[0-9]{4}$')
-        && (!('email' in d) || isStr(d.email, 0, 120))
-        && (!('message' in d) || isStr(d.message, 0, 1000))
-        && validAnswers(d, d.answers)
-        && d.consent == true
-        && d.consentVersion == '2026-10-23'
-        && d.status == 'new'
-        && d.createdAt == request.time;
-    }
-    match /consultation_requests/{docId} {
-      allow create: if validRequest(request.resource.data);
-      allow read, update, delete: if false;
-    }
     match /{document=**} {
       allow read, write: if false;
     }

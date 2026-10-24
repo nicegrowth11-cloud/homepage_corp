@@ -102,3 +102,38 @@ nav a[aria-current=page]{color:#1461d1;font-weight:600}
 .consult-phone a{color:#124fc4;font-weight:600}
 @media(max-width:560px){.consult-dialog{padding:26px 20px 20px}.consult-dialog h2{font-size:22px}.consult-grid{grid-template-columns:1fr}.consult-row.half{grid-column:1/-1}.consult-choice{flex-direction:column;align-items:flex-start;gap:4px}}
 .consult-dialog [hidden]{display:none!important}
+/* 개인정보 처리방침 페이지 */
+.policy{padding:56px 0 80px}
+.policy-body{max-width:860px;margin:0 auto;color:#102e65;font-size:16px;line-height:1.85;word-break:keep-all;overflow-wrap:anywhere}
+.policy-body h1{font-size:36px;line-height:1.35;margin:28px 0 20px;letter-spacing:-1px}
+.policy-body h2{font-size:23px;line-height:1.45;margin:44px 0 12px;padding-top:18px;border-top:1px solid #d6e7f7}
+.policy-body p,.policy-body li{white-space:pre-line}
+.policy-body p{margin:0 0 14px}
+.policy-body ul,.policy-body ol{padding-left:22px;margin:0 0 14px}
+.policy-body li{margin:4px 0}
+.policy-body a{color:#124fc4;text-decoration:underline;text-underline-offset:3px}
+.policy-body blockquote{margin:0;padding:16px 20px;border-left:5px solid #d97706;background:#fff7e6;color:#7a3e00;border-radius:8px}
+.policy-body blockquote p{margin:0}
+.policy-body hr{border:0;border-top:1px solid #d6e7f7;margin:32px 0}
+.policy-body table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;margin:6px 0 20px;font-size:14.5px;line-height:1.7}
+.policy-body th,.policy-body td{border:1px solid #d6e7f7;padding:9px 12px;text-align:left;vertical-align:top;min-width:110px}
+.policy-body th{background:#f0f7ff;font-weight:600}
+@media(max-width:560px){.policy{padding:36px 0 60px}.policy-body{font-size:15px}.policy-body h1{font-size:28px}.policy-body h2{font-size:20px}}
+.footer-privacy{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+/* 상담 폼 항목별 동의 */
+.consult-notice{margin:2px 0 0;font-size:12.5px;line-height:1.6;color:#b4372a}
+.consult-consents{margin:18px 0 0;padding:14px 16px;border:1px solid #d6e7f7;border-radius:10px}
+.consult-consents legend{padding:0 6px;font-size:14px;font-weight:700;color:#102e65}
+.consult-consent-item+.consult-consent-item{margin-top:10px;padding-top:10px;border-top:1px dashed #d6e7f7}
+.consult-consent-item label{display:flex;gap:9px;align-items:flex-start;font-size:14px;font-weight:600;color:#102e65;cursor:pointer;line-height:1.5}
+.consult-consent-item input{width:18px;height:18px;flex:none;margin:2px 0 0}
+.consult-consent-detail{margin:6px 0 0 27px;font-size:12.5px;color:#4c6f91;line-height:1.7}
+.consult-consent-detail summary{cursor:pointer;color:#124fc4;text-decoration:underline;text-underline-offset:3px;width:max-content}
+.consult-consent-detail p{margin:6px 0 0}
+.consult-consent-title{font-weight:700;color:#102e65}
+.consult-consent-detail ul{margin:6px 0 0;padding-left:18px}
+.consult-submit:disabled:not([aria-busy]){cursor:not-allowed}
+.consult-privacy{margin:10px 0 0;font-size:13.5px}
+.consult-privacy a{color:#124fc4;text-decoration:underline;text-underline-offset:3px}
+.policy-body hr+h2{border-top:0;padding-top:0;margin-top:0}
+.consult-consent-detail p,.consult-consent-detail li{font-size:12.5px;line-height:1.7;letter-spacing:0}.consult-consent-detail .consult-consent-title{font-size:13px}
