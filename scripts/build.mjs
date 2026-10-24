@@ -1,11 +1,11 @@
-import { mkdir, readFile, writeFile, copyFile, rm, stat } from 'node:fs/promises';
+import { mkdir, readFile, copyFile, rm, stat } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'dist');
 const entries = ['index.html', 'conversion.html', 'local.css', 'local.js'];
-const files = new Set(entries);
+const files = new Set([...entries, 'assets/SUITE-LICENSE.txt']);
 
 // Only publish files referenced by the site; keep research snapshots out of deployments.
 for (const file of entries) {

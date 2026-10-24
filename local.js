@@ -1,7 +1,106 @@
-const toggle=document.querySelector('.menu-toggle'),nav=document.querySelector('nav');
-toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'메뉴 닫기':'메뉴 열기');nav.classList.toggle('open',open)});
-nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','메뉴 열기')}));
-const modal=document.createElement('dialog');modal.className='modal';modal.id='consultation';modal.setAttribute('aria-labelledby','consult-title');modal.innerHTML=`<button class="close" type="button" aria-label="상담창 닫기">✕</button><span class="eyebrow">LET’S START TOGETHER</span><h2 id="consult-title">법인 설립, 무엇이 궁금하세요?</h2><p>정해진 정보만 적어주세요. 비용 지원 조건과 준비할 내용을 함께 정리할 수 있습니다.</p><p class="notice">현재는 상담 내용 작성·임시 저장 기능을 제공합니다. 내용은 이 브라우저에만 저장되며 실제 접수·전송은 이루어지지 않습니다.</p><form><label for="name">성함 <span aria-hidden="true">*</span></label><input id="name" name="name" maxlength="50" required autocomplete="name"><label for="phone">연락처 <span aria-hidden="true">*</span></label><input id="phone" name="phone" type="tel" required pattern="[0-9+() -]{8,20}" autocomplete="tel" placeholder="010-0000-0000"><label for="service">상담 분야</label><select id="service" name="service"><option>법인 설립</option><option>법인 전환</option><option>세무 관리</option></select><div class="form-pair"><div><label for="capital">예상 자본금 <span class="optional">선택</span></label><input id="capital" name="capital" maxlength="50" placeholder="예: 1,000만 원 / 미정"></div><div><label for="targetDate">설립 예정일 <span class="optional">선택</span></label><input id="targetDate" name="targetDate" type="date"></div></div><label for="industry">예정 업종 <span class="optional">선택</span></label><input id="industry" name="industry" maxlength="100" placeholder="예: 온라인 판매 / 소프트웨어 개발"><label for="message">문의 내용</label><textarea id="message" name="message" rows="3" maxlength="2000" placeholder="사업의 현재 상황이나 궁금한 점을 남겨주세요."></textarea><label><input type="checkbox" required> 입력 내용을 이 브라우저에 임시 저장하는 데 동의합니다.</label><button class="button" type="submit">상담 내용 임시 저장 <span>↗</span></button><p role="status" id="consult-status"></p></form>`;document.body.append(modal);
-modal.querySelector('.close').addEventListener('click',()=>modal.close());modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)modal.close()}});
-document.querySelectorAll('[data-consult]').forEach(button=>button.addEventListener('click',()=>{document.querySelector('#consult-status').textContent='';if(location.pathname.endsWith('conversion.html'))modal.querySelector('#service').value='법인 전환';modal.showModal()}));
-modal.querySelector('form').addEventListener('submit',e=>{e.preventDefault();try{localStorage.setItem('ceopartners-consultation',JSON.stringify({...Object.fromEntries(new FormData(e.target)),savedAt:new Date().toISOString()}));document.querySelector('#consult-status').textContent='이 브라우저에 임시 저장했습니다. 실제 상담이 접수된 것은 아닙니다.'}catch{document.querySelector('#consult-status').textContent='브라우저 저장이 제한되어 저장하지 못했습니다.'}});
+'use strict';
+const toggle = document.querySelector('.menu-toggle');
+const navigation = document.querySelector('#navigation');
+const modal = document.querySelector('#consultation');
+const form = document.querySelector('#consult-form');
+const service = document.querySelector('#service');
+const result = document.querySelector('#consult-result');
+const summary = document.querySelector('#consult-summary');
+const copyStatus = document.querySelector('#copy-status');
+const topics = Object.freeze({
+  establish: {
+    label: '법인 설립',
+    title: '법인 설립 무엇이 궁금하세요?',
+    description: '설립 비용과 준비 서류, 예정 업종 등 궁금한 내용을 정리해주세요.',
+    placeholder: '예: 온라인 판매 법인을 준비 중입니다. 설립 비용과 준비 서류를 알고 싶습니다.'
+  },
+  conversion: {
+    label: '법인 전환',
+    title: '법인 전환 어떤 준비가 필요하신가요?',
+    description: '현재 개인사업자의 업종과 전환 목적, 희망 시기를 알려주세요.',
+    placeholder: '예: 개인사업자로 운영 중이며 공동 투자와 법인 전환을 검토하고 있습니다.'
+  },
+  operation: {
+    label: '세무 관리',
+    title: '운영의 모든 것 무엇이든 물어보세요',
+    description: '기장·신고, 급여·증빙 관리 등 현재 운영에서 필요한 도움을 정리해주세요.',
+    placeholder: '예: 설립한 법인의 기장과 급여 관리에 대해 상담하고 싶습니다.'
+  }
+});
+function closeMenu() {
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-label', '메뉴 열기');
+  navigation.classList.remove('open');
+}
+toggle.addEventListener('click', () => {
+  const open = toggle.getAttribute('aria-expanded') !== 'true';
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+  navigation.classList.toggle('open', open);
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+    closeMenu();
+    toggle.focus();
+  }
+});
+function updateTopic(value) {
+  const topic = topics[value] || topics.establish;
+  document.querySelector('#consult-title').textContent = topic.title;
+  document.querySelector('#consult-description').textContent = topic.description;
+  document.querySelector('#message').placeholder = topic.placeholder;
+  result.hidden = true;
+  summary.textContent = '';
+  copyStatus.textContent = '';
+}
+document.querySelectorAll('[data-consult]').forEach(button => {
+  button.addEventListener('click', () => {
+    closeMenu();
+    service.value = Object.hasOwn(topics, button.dataset.consult) ? button.dataset.consult : 'establish';
+    updateTopic(service.value);
+    modal.showModal();
+  });
+});
+service.addEventListener('change', () => updateTopic(service.value));
+modal.querySelector('.close').addEventListener('click', () => modal.close());
+modal.addEventListener('click', event => {
+  if (event.target !== modal) return;
+  const rect = modal.getBoundingClientRect();
+  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) modal.close();
+});
+// Clear personal text when the dialog is closed. No form input is persisted or sent.
+modal.addEventListener('close', () => {
+  form.reset();
+  result.hidden = true;
+  summary.textContent = '';
+  copyStatus.textContent = '';
+});
+// Remove the previous implementation's one local draft, without reading its contents.
+try { localStorage.removeItem('ceopartners-consultation'); } catch { /* Storage may be unavailable. */ }
+function plainText(value, maxLength) {
+  return String(value || '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim().slice(0, maxLength);
+}
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!form.reportValidity()) return;
+  const data = new FormData(form);
+  const topic = topics[data.get('service')] || topics.establish;
+  // Use textContent only: markup or SQL-like strings remain plain text, never executable code.
+  summary.textContent = [
+    `상담 분야: ${topic.label}`,
+    `성함: ${plainText(data.get('name'), 50) || '미기재'}`,
+    `연락처: ${plainText(data.get('phone'), 20) || '미기재'}`,
+    '',
+    plainText(data.get('message'), 2000)
+  ].join('\n');
+  result.hidden = false;
+  copyStatus.textContent = '문의 내용이 화면에 정리되었습니다. 아직 접수되지 않았습니다.';
+});
+document.querySelector('#copy-summary').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(summary.textContent);
+    copyStatus.textContent = '복사했습니다. 이메일 작성 시 직접 붙여넣어 문의할 수 있습니다.';
+  } catch {
+    copyStatus.textContent = '자동 복사를 사용할 수 없습니다. 위 내용을 직접 선택해 복사해주세요.';
+  }
+});
